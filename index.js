@@ -7,12 +7,10 @@ const cors = require('cors')
 const port = process.env.PORT || 5000
 require('dotenv').config()
 
-// app.use(cors({
-//     origin: ['https://assignment-11-947ba.web.app'],
-//     // origin: ['http://localhost:5173'],
-//     credentials:true,
-//   }))
-app.use(cors())
+app.use(cors({
+    origin: ['http://localhost:5173'],
+    credentials:true,
+  }))
 app.use(express.json())
 // app.use(cookieParser())
 
@@ -33,6 +31,13 @@ async function run() {
   try {
     const publisher = client.db("NewsInfoDB").collection("Publisher");
     // await client.connect();
+
+
+    app.get('/publisher',async (req, res) => {
+      // console.log(req.cookies)
+      const result = await publisher.find().toArray()
+      res.send(result)
+    })
 
     app.post('/publisher',async(req,res)=>{
       try {
