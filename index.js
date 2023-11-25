@@ -30,6 +30,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const publisher = client.db("NewsInfoDB").collection("Publisher");
+    const addArticle = client.db("NewsInfoDB").collection("addArticle");
     // await client.connect();
 
 
@@ -38,11 +39,20 @@ async function run() {
       const result = await publisher.find().toArray()
       res.send(result)
     })
-
     app.post('/publisher',async(req,res)=>{
       try {
         const body = req.body
         const result = await publisher.insertOne(body)
+        res.send(result)
+      }catch(error){
+        console.log(error)
+      }
+    })
+
+    app.post('/addArticle',async(req,res)=>{
+      try {
+        const body = req.body
+        const result = await addArticle.insertOne(body)
         res.send(result)
       }catch(error){
         console.log(error)
