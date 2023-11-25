@@ -34,6 +34,16 @@ async function run() {
     const publisher = client.db("NewsInfoDB").collection("Publisher");
     // await client.connect();
 
+    app.post('/publisher',async(req,res)=>{
+      try {
+        const body = req.body
+        const result = await publisher.insertOne(body)
+        res.send(result)
+      }catch(error){
+        console.log(error)
+      }
+    })
+
 
 
     await client.db("admin").command({ ping: 1 });
