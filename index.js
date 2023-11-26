@@ -35,7 +35,6 @@ async function run() {
 
 
     app.get('/publisher',async (req, res) => {
-      // console.log(req.cookies)
       const result = await publisher.find().toArray()
       res.send(result)
     })
@@ -53,6 +52,16 @@ async function run() {
       const result = await addArticle.find().toArray()
       res.send(result)
     })
+
+    app.get('/approvedArticle',async (req, res) => {
+      let query = {}
+      if (req?.query?.status) {
+        query = { status: req?.query?.status}
+      }
+      const result = await addArticle.find(query).toArray()
+      res.send(result)
+    })
+
     app.post('/addArticle',async(req,res)=>{
       try {
         const body = req.body
@@ -62,9 +71,9 @@ async function run() {
         console.log(error)
       }
     })
+    
     app.patch(`/addArticle/:id`,async(req,res) => {
       const id = req.params.id
-      console.log(id)
       const query = { _id: new ObjectId(id) }
       const options = { upsert: true };
       const bodyData = req?.body
@@ -79,11 +88,9 @@ async function run() {
     })
     app.patch(`/premium/:id`,async(req,res) => {
       const id = req.params.id
-      console.log(id)
       const query = { _id: new ObjectId(id) }
       const options = { upsert: true };
       const bodyData = req?.body
-      console.log(bodyData)
       const update = {
         $set: {
           premium: bodyData?.premium,
