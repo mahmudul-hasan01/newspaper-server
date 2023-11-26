@@ -71,13 +71,28 @@ async function run() {
       console.log(bodyData)
       const update = {
         $set: {
-          status: bodyData?.status,
+          status: bodyData?.status ,
         }
       }
       const result = await addArticle.updateOne(query, update, options)
       res.send(result)
     })
-    app
+    app.patch(`/premium/:id`,async(req,res) => {
+      const id = req.params.id
+      console.log(id)
+      const query = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const bodyData = req?.body
+      console.log(bodyData)
+      const update = {
+        $set: {
+          premium: bodyData?.premium,
+        }
+      }
+      const result = await addArticle.updateOne(query, update, options)
+      res.send(result)
+    })
+
     app.delete('/addArticles/:id', async (req, res) => {
       const id = req.params.id
       console.log(id)
