@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -62,7 +62,22 @@ async function run() {
         console.log(error)
       }
     })
-    
+    app.patch(`/addArticle/:id`,async(req,res) => {
+      const id = req.params.id
+      console.log(id)
+      const query = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const bodyData = req?.body
+      console.log(bodyData)
+      const update = {
+        $set: {
+          status: bodyData?.status,
+        }
+      }
+      const result = await addArticle.updateOne(query, update, options)
+      res.send(result)
+    })
+    app
     app.delete('/addArticles/:id', async (req, res) => {
       const id = req.params.id
       console.log(id)
