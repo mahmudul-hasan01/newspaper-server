@@ -49,6 +49,10 @@ async function run() {
       }
     })
 
+    app.get('/addArticle',async (req, res) => {
+      const result = await addArticle.find().toArray()
+      res.send(result)
+    })
     app.post('/addArticle',async(req,res)=>{
       try {
         const body = req.body
