@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 // const jwt =require('jsonwebtoken')
 // const cookieParser = require('cookie-parser')
+const stripe = require("stripe")(process.env.SK)
 const port = process.env.PORT || 5000
 require('dotenv').config()
 
@@ -54,13 +55,32 @@ async function run() {
     })
 
     app.get('/approvedArticle',async (req, res) => {
+      const filter =req.query
+      console.log(filter)
       let query = {}
       if (req?.query?.status) {
-        query = { status: req?.query?.status}
+        query = { 
+          title:{$regex: filter.search, $options:'i' },
+          status: req?.query?.status
+        }
       }
       const result = await addArticle.find(query).toArray()
       res.send(result)
     })
+
+    // app.get('/approved',async (req, res) => {
+    //   const filter =req.query
+    //   console.log(filter)
+      // const query ={
+      //   title:{$regex: filter.search, $options:'i' }
+      // }
+      // let query = {}
+      // if (req?.query?.status) {
+      //   query = { status: req?.query?.status}
+      // }
+      // const result = await addArticle.find(query).toArray()
+      // res.send(result)
+    // })
 
     app.post('/addArticle',async(req,res)=>{
       try {
@@ -71,13 +91,12 @@ async function run() {
         console.log(error)
       }
     })
-    
+
     app.patch(`/addArticle/:id`,async(req,res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
       const options = { upsert: true };
       const bodyData = req?.body
-      console.log(bodyData)
       const update = {
         $set: {
           status: bodyData?.status ,
@@ -106,6 +125,22 @@ async function run() {
       const query = { _id: new ObjectId(id)}
       const result = await addArticle.deleteOne(query)
       res.send(result)
+    })
+
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
+      const amount =parseInt(price * 100)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types:['card']
+        // automatic_payment_methods: {
+        //   enabled: true,
+        // },
+      });
+      res.send({
+        clientSecret:paymentIntent.client_secret
+      })
     })
 
 
