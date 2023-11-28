@@ -32,8 +32,54 @@ async function run() {
   try {
     const publisher = client.db("NewsInfoDB").collection("Publisher");
     const addArticle = client.db("NewsInfoDB").collection("addArticle");
+    const user = client.db("NewsInfoDB").collection("user");
     // await client.connect();
 
+
+    app.get('/user',async (req, res) => {
+      const result = await user.find().toArray()
+      res.send(result)
+    })
+    // app.put('/user/:email', async (req, res) => {
+    //   const email = req.params.email
+    //   console.log("email",email)
+    //   const user = req.body
+    //   console.log('user',user)
+    //   const query = { email: email }
+    //   const options = { upsert: true }
+    //   const isExist = await user.findOne(query)
+    //   console.log('User found?----->', isExist)
+    //   if (isExist) return res.send(isExist)
+    //   const result = await user.updateOne(
+    //     query,
+    //     {
+    //       $set: { ...user, timestamp: Date.now() },
+    //     },
+    //     options
+    //   )
+    //   res.send(result)
+    // })
+
+
+    app.put('/user/:email', async (req, res) => {
+      const email = req.params.email
+      console.log("email",email)
+      const query = { email: email }
+      const options = { upsert: true };
+      const bodyData = req.body
+      console.log('user',bodyData)
+
+      const update = {
+        $set: {
+          name: bodyData.name,
+          email: bodyData.email,
+          image: bodyData.image,
+          role: bodyData.role,
+        }
+      }
+      const result = await user.updateOne(query, update, options)
+      res.send(result)
+    })
 
     app.get('/publisher',async (req, res) => {
       const result = await publisher.find().toArray()
@@ -61,7 +107,20 @@ async function run() {
       if (req?.query?.status) {
         query = { 
           title:{$regex: filter.search, $options:'i' },
-          status: req?.query?.status
+          status: req?.query?.status 
+
+        }
+      }
+      const result = await addArticle.find(query).toArray()
+      res.send(result)
+    })
+
+    app.get('/premiumArticle',async (req, res) => {
+      // const filter =req.query.premium
+      let query = {}
+      if (req?.query?.premium) {
+        query = { 
+          premium: req?.query?.premium 
         }
       }
       const result = await addArticle.find(query).toArray()
